@@ -1,5 +1,4 @@
-import axios from "axios";
-import mongoose from "mongoose";
+
 import { FindUserDto } from "../../entities/user/dto/find-user.dto";
 import { User } from '../../entities/user/user.entity'
 import {  Responses, HttpResponse } from '../../../utils/responses/responses'
@@ -23,7 +22,7 @@ export class UserService{
     }
 
     public async findOne(id: string): Promise<FindUserDto>{
-        try{ return await this.Model.findById(id) as unknown as FindUserDto }
+        try{ return await this.Model.findById(id, ['_id', 'username', 'email', 'picture']) as unknown as FindUserDto }
         catch(e){ throw Responses.NOT_FOUND }
     }
 

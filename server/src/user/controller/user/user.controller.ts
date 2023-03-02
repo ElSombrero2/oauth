@@ -8,9 +8,16 @@ export class UserController{
 
     constructor(private userService: UserService){}
 
+    public async create(req: Request, res: Response){
+        return await this.userService.create(req.body)
+    }
+
     public async findAll(req: Request, res: Response): Promise<FindUserDto[]>{
-        try{ return await this.userService.findAll() }
-        catch(e){ throw e }
+        return await this.userService.findAll()
+    }
+
+    public async findOne(req: Request, res: Response): Promise<FindUserDto>{
+        return await this.userService.findOne(req.params.id)
     }
 
 }

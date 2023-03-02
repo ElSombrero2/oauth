@@ -79,7 +79,7 @@ describe('User service', () => {
         spyOnFindById.mockResolvedValue(data)
 
         expect(await service.findOne(data._id)).toEqual(data)
-        expect(spyOnFindById).toBeCalledWith(data._id)
+        expect(spyOnFindById).toBeCalledWith(data._id, ['_id', 'username', 'email', 'picture'])
 
     })
 
@@ -92,7 +92,7 @@ describe('User service', () => {
         try{ await service.findOne(id) }
         catch(e){
             expect(e).toEqual(Responses.NOT_FOUND)
-            expect(spyOnFindById).toBeCalledWith(id)
+            expect(spyOnFindById).toBeCalledWith(id, ['_id', 'username', 'email', 'picture'])
         }
     })
 

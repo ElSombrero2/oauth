@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 
 
-export function handle(controller: any, name: string, req: Request, res: Response){
-    try{ res.json(controller[name]()) }
+export async function handle(controller: any, name: string, req: Request, res: Response){
+    try{ res.json(await controller[name](req, res))  }
     catch(e: any){
-        if(e.status) res.sendStatus(e.status)
-        res.json(e) 
+        if(e.status) res.status(e.status)
+        res.json(e)
     }
 }
