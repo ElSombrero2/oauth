@@ -1,7 +1,9 @@
 import mongoose from 'mongoose'
 import { AuthTypes } from '../../../utils/auth-types'
+import bcrypt from 'bcrypt'
+import { PasswordMiddleware } from './middlewares/password/password.middleware'
 
-const UserSchema = new mongoose.Schema({
+export const UserSchema = new mongoose.Schema({
     email: {
         type: mongoose.Schema.Types.String,
         required: true,
@@ -24,6 +26,8 @@ const UserSchema = new mongoose.Schema({
     }
 })
 
-export type User = typeof UserSchema
+UserSchema.pre('save', PasswordMiddleware(bcrypt))
 
 export const UserModel = mongoose.model('user', UserSchema)
+
+export type User = typeof UserModel
