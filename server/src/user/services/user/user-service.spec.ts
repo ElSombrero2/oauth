@@ -4,6 +4,7 @@ import { UserService } from "./user.service"
 import {faker} from '@faker-js/faker'
 import { Responses } from "../../../utils/responses/responses"
 import { CreateUserDto } from "../../entities/user/dto/create-user.dto"
+import { AuthTypes } from "../../../utils/auth-types"
 
 jest.mock('../../entities/user/user.entity')
 
@@ -29,7 +30,19 @@ describe('User service', () => {
 
     })
 
-    it('Should throw an Internal Server Error if there is an error', async () => {
+    it('Should throw an Internal Server Error if password is falsy', async () => {
+
+        const user: any = {
+            username: faker.internet.userName(), 
+            email: faker.internet.email()
+        };
+        
+        try{await service.create(user)}
+        catch(e) { expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
+
+    })
+
+    it('Should throw an Internal Server Error if there is an error in create', async () => {
 
         const user: CreateUserDto = {
             username: faker.internet.userName(), 
@@ -40,6 +53,35 @@ describe('User service', () => {
         (UserModel as unknown as jest.Mock).mockReturnValue({save: jest.fn().mockRejectedValue(null)})
 
         try{ await service.create(user) }
+        catch(e){ expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
+
+    })
+
+    it('Should create and user and save it to the database from Oauth2', async () => {
+
+        const username = faker.internet.userName() 
+        const email = faker.internet.email()
+        const picture = faker.image.avatar()
+        const _id = faker.datatype.uuid() 
+        const user = {username, picture, email, type: AuthTypes.GOOGLE}
+        const saveMock = jest.fn();
+        (UserModel as unknown as jest.Mock).mockReturnValue({_id, ...user, save: saveMock})
+        
+        expect(await service.createWithOauth2(username, email, picture)).toEqual({_id, ...user, save: saveMock})
+        expect(UserModel).toBeCalledWith(user)
+        expect(saveMock).toBeCalledTimes(1)
+
+    })
+
+    it('Should throw an Internal Server Error if there is an error in createOAuth2', async () => {
+
+        const username = faker.internet.userName() 
+        const email = faker.internet.email()
+        const picture = faker.image.avatar();
+
+        (UserModel as unknown as jest.Mock).mockReturnValue({save: jest.fn().mockRejectedValue(null)})
+
+        try{ await service.createWithOauth2(username, email, picture) }
         catch(e){ expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
 
     })
@@ -94,6 +136,36 @@ describe('User service', () => {
             expect(e).toEqual(Responses.NOT_FOUND)
             expect(spyOnFindById).toBeCalledWith(id, ['_id', 'username', 'email', 'picture'])
         }
+    })
+
+    it('Should find an user from Database by email', async () => {
+
+        const data: FindUserDto = {
+            _id: faker.datatype.uuid(), 
+            email: faker.internet.email(), 
+            username: faker.internet.userName(), 
+            picture: faker.image.people()
+        }
+        const spyOnFindOne = jest.spyOn(UserModel, 'findOne')
+        spyOnFindOne.mockResolvedValue(data)
+
+        expect(await service.findByEmail(data.email)).toEqual(data)
+        expect(spyOnFindOne).toBeCalledWith({email: data.email}, ['_id', 'username', 'email', 'picture'])
+
+    })
+
+    it('Should throw a Not Found Exception if the user is not macthed', async () => {
+
+        const email = 'false_email'
+        const spyOnFindOne = jest.spyOn(UserModel, 'findOne')
+        spyOnFindOne.mockRejectedValue(null)
+
+        try{ await service.findByEmail(email) }
+        catch(e){
+            expect(e).toEqual(Responses.NOT_FOUND)
+            expect(spyOnFindOne).toBeCalledWith({email}, ['_id', 'username', 'email', 'picture'])
+        }
+
     })
 
 })

@@ -15,11 +15,9 @@ export class AuthController{
 
     public async loginWithGoogle(req: Request, res: Response): Promise<void>{
         try{         
-            await this.googleService.handle(req.query.code as string)
-            res.redirect('http://localhost:3000/waiting-for-user')
-        }catch(e){
-            res.redirect('http://localhost:5143/auth-error')
-        }
+            const token = await this.googleService.login(req.query.code as string)
+            res.redirect('http://localhost:5173/waiting-for-user?token=' + token.token)
+        }catch(e){ res.redirect('http://localhost:5173/auth-error') }
     }
 
 }

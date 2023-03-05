@@ -14,7 +14,8 @@ export class AuthService{
         try{
             const user = await this.Model.findOne({username})
             if(!user) throw Responses.NOT_FOUND
-            if(!this.bcrypt.compareSync(password, user.password)) throw Responses.WRONG_PASSWORD
+            if(!user.password || !this.bcrypt.compareSync(password, user.password)) 
+                throw Responses.WRONG_PASSWORD
             const {_id, email, picture} = user
             return { token: this.jwt.sign({_id, username, email, picture}) }
         }catch(e: any){

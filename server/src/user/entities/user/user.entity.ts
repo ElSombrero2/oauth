@@ -14,10 +14,7 @@ export const UserSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    password: {
-        type: mongoose.Schema.Types.String,
-        required: true
-    },
+    password: mongoose.Schema.Types.String,
     picture: mongoose.Schema.Types.String,
     type: {
         type: mongoose.Schema.Types.String,
