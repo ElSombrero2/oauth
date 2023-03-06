@@ -1,32 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+import { createBrowserRouter, Link, Outlet, RouterProvider, useActionData, useLoaderData, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+
+const Home = (): JSX.Element => {
+  
+  const [query, setQuery] = useSearchParams()
+  const navigate = useNavigate()
+  const data = useLoaderData()
+  console.log(data)
 
   return (
-    <div className="App">
+    <div>
+      Home
+      <Link to='/waiting-for-user'>User</Link>
+      <Outlet />
+    </div>
+  )
+}
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Home />,
+    loader: () => {
+      console.log('Handle')
+      return {name: 'Me'}
+    },
+    children: [
+      {
+        path: '/',
+        element: (
+          <div>
+            First Page
+          </div>
+        )
+      },
+    ]
+  },
+  {
+    path: '/waiting-for-user',
+    element: (
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        Waiting For User
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+    )
+  },
+  {
+    path: '*',
+    element: (
+      <div>
+        Not Found
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    )
+  }
+])
+
+function App() {
+  const url = import.meta.env.VITE_FULL_URI
+  return (
+    <div className="App">
+      <RouterProvider router={router} />
     </div>
   )
 }
