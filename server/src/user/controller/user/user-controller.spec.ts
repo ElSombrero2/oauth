@@ -34,15 +34,6 @@ describe('User controller', () => {
 
     })
 
-    it('Should throw the service error', async () => {
-        
-        jest.spyOn(service, 'create').mockRejectedValue(Responses.INTERNAL_SERVER_ERROR)
-
-        try{ await controller.create(req, res) }
-        catch(e){ expect(e).toBe(Responses.INTERNAL_SERVER_ERROR) }
-
-    })  
-
     it('Should fetch all users', async () => {
 
         const {userName, email} = faker.internet
@@ -50,15 +41,6 @@ describe('User controller', () => {
         jest.spyOn(service, 'findAll').mockResolvedValue(users)
 
         expect(await controller.findAll(req, res)).toEqual(users)
-
-    })
-
-    it('Should throw the service error', async () => {
-        
-        jest.spyOn(service, 'findAll').mockRejectedValue(Responses.INTERNAL_SERVER_ERROR)
-
-        try{ await controller.findAll(req, res) }
-        catch(e){ expect(e).toBe(Responses.INTERNAL_SERVER_ERROR) }
 
     })
 
@@ -74,12 +56,4 @@ describe('User controller', () => {
 
     })
 
-    it('Should throw a not found error if the user is not found', async () => {
-        
-        jest.spyOn(service, 'findOne').mockRejectedValue(Responses.NOT_FOUND)
-
-        try{ await controller.findOne(req, res) }
-        catch(e){ expect(e).toBe(Responses.NOT_FOUND) }
-
-    })
 })

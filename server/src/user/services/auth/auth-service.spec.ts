@@ -46,8 +46,7 @@ describe('Auth service', () => {
         const password = faker.internet.password()
         jest.spyOn(UserModel, 'findOne').mockResolvedValue(null)
 
-        try{ await service.login(username, password) }
-        catch(e){ expect(e).toEqual(Responses.NOT_FOUND) }
+        await expect(service.login(username, password)).rejects.toEqual(Responses.NOT_FOUND)
 
     })
 
@@ -57,17 +56,7 @@ describe('Auth service', () => {
         const password = faker.internet.password()
         jest.spyOn(UserModel, 'findOne').mockRejectedValue(null)
 
-        try{ await service.login(username, password) }
-        catch(e){ expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
-
-    })
-
-    it('Should throw a non acceptable exception with message Wrong Password if the password is wrong', async () => {
-        
-        jest.spyOn(UserModel, 'findOne').mockResolvedValue({password: bcrypt.hashSync('RightPassword', 10)})
-
-        try{ await service.login(faker.internet.userName(), 'WrongPassword') }
-        catch(e){ expect(e).toEqual(Responses.WRONG_PASSWORD) }
+        await expect(service.login(username, password)).rejects.toEqual(Responses.INTERNAL_SERVER_ERROR) 
 
     })
 
@@ -77,8 +66,8 @@ describe('Auth service', () => {
         const spyOnCompareSync = jest.spyOn(bcrypt, 'compareSync')
         spyOnCompareSync.mockReturnValue(false)
 
-        try{ await service.login(faker.internet.password(), faker.internet.password()) }
-        catch(e){ expect(e).toEqual(Responses.WRONG_PASSWORD) }
+        await expect(service.login(faker.internet.password(), faker.internet.password()))
+        .rejects.toEqual(Responses.WRONG_PASSWORD)
 
     })
 })

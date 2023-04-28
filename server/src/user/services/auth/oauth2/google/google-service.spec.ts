@@ -63,8 +63,7 @@ describe('Google service', () => {
         jest.spyOn(GoogleOauth2Client, 'post').mockResolvedValue({data: oauth2Response})
         jest.spyOn(GoogleApiClient, 'get').mockResolvedValue({data: user})
 
-        try{ await service.login('Code') }
-        catch(e){ expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
+        await expect(service.login('Code')).rejects.toEqual(Responses.INTERNAL_SERVER_ERROR)
 
     })
 
@@ -74,8 +73,7 @@ describe('Google service', () => {
 
         jest.spyOn(GoogleOauth2Client, 'post').mockRejectedValue(null)
 
-        try{ await service.login(code) }
-        catch(e){ expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
+        await expect(service.login(code)).rejects.toEqual(Responses.INTERNAL_SERVER_ERROR)
 
     })
 })

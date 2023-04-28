@@ -37,8 +37,7 @@ describe('User service', () => {
             email: faker.internet.email()
         };
         
-        try{await service.create(user)}
-        catch(e) { expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
+        await expect(service.create(user)).rejects.toEqual(Responses.INTERNAL_SERVER_ERROR)
 
     })
 
@@ -50,11 +49,11 @@ describe('User service', () => {
             password: faker.internet.password()
         };
 
-        (UserModel as unknown as jest.Mock).mockReturnValue({save: jest.fn().mockRejectedValue(null)})
+        const save = jest.fn().mockRejectedValue(null);
 
-        try{ await service.create(user) }
-        catch(e){ expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
+        (UserModel as unknown as jest.Mock).mockReturnValue({...user, save})
 
+        await expect(service.create(user)).rejects.toEqual(Responses.INTERNAL_SERVER_ERROR)
     })
 
     it('Should create and user and save it to the database from Oauth2', async () => {
@@ -81,8 +80,7 @@ describe('User service', () => {
 
         (UserModel as unknown as jest.Mock).mockReturnValue({save: jest.fn().mockRejectedValue(null)})
 
-        try{ await service.createWithOauth2(username, email, picture) }
-        catch(e){ expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
+        await expect(service.createWithOauth2(username, email, picture)).rejects.toEqual(Responses.INTERNAL_SERVER_ERROR)
 
     })
 
@@ -103,9 +101,8 @@ describe('User service', () => {
     it('Should throw an Internal Server Error on Error', async () => {
         
         jest.spyOn(UserModel, 'find').mockRejectedValue(null)
-
-        try{ await service.findAll() }
-        catch(e){ expect(e).toEqual(Responses.INTERNAL_SERVER_ERROR) }
+        
+        await expect(service.findAll()).rejects.toEqual(Responses.INTERNAL_SERVER_ERROR)
 
     })
 
@@ -131,11 +128,9 @@ describe('User service', () => {
         const spyOnFindById = jest.spyOn(UserModel, 'findById')
         spyOnFindById.mockRejectedValue(null)
 
-        try{ await service.findOne(id) }
-        catch(e){
-            expect(e).toEqual(Responses.NOT_FOUND)
-            expect(spyOnFindById).toBeCalledWith(id, ['_id', 'username', 'email', 'picture'])
-        }
+        await expect(service.findOne(id)).rejects.toEqual(Responses.NOT_FOUND)
+        expect(spyOnFindById).toBeCalledWith(id, ['_id', 'username', 'email', 'picture'])
+
     })
 
     it('Should find an user from Database by email', async () => {
@@ -160,11 +155,8 @@ describe('User service', () => {
         const spyOnFindOne = jest.spyOn(UserModel, 'findOne')
         spyOnFindOne.mockRejectedValue(null)
 
-        try{ await service.findByEmail(email) }
-        catch(e){
-            expect(e).toEqual(Responses.NOT_FOUND)
-            expect(spyOnFindOne).toBeCalledWith({email}, ['_id', 'username', 'email', 'picture'])
-        }
+        await expect(service.findByEmail(email) ).rejects.toEqual(Responses.NOT_FOUND)
+        expect(spyOnFindOne).toBeCalledWith({email}, ['_id', 'username', 'email', 'picture'])
 
     })
 

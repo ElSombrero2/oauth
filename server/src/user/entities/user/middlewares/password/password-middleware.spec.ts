@@ -1,5 +1,5 @@
 import { PasswordMiddleware } from "./password.middleware"
-import bcrypt, { hash } from 'bcrypt'
+import bcrypt from 'bcrypt'
 
 
 describe('Password Middleware', () => {

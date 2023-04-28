@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { HttpResponse } from "../../../utils/responses/responses";
 import { FindUserDto } from "../../entities/user/dto/find-user.dto";
 import { UserService } from "../../services/user/user.service";
 
